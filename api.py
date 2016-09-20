@@ -1,5 +1,10 @@
 import json
-import urllib.request
+# Fix for Python 2
+try:
+        import urllib.request as urlrequest
+except ImportError:
+        import urllib as urlrequest
+
 from flask import Flask
 
 app = Flask(__name__)
@@ -63,7 +68,7 @@ class Source:
                 self.data_set.update(response)
 
     def make_request(self, url):
-        response = urllib.request.urlopen(url)
+        response = urlrequest.urlopen(url)
 
         if response:
             response = json.loads(str(response.read(), 'utf-8'))
