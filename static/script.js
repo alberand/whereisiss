@@ -1,60 +1,45 @@
-var zoom = 2;
-var center = [0, 0];
-// Create map
-var map = new ol.Map({
-  target: 'map',
-  view: new ol.View({
-    // center: ol.proj.fromLonLat(center),
-    center: ol.proj.fromLonLat([0, 0]),
-    zoom: zoom,
-    minZoom: 1,
-    maxZoom: 19
-  }),
 
-  // Add layers
-  layers: [
-    new ol.layer.Tile({
-      source: new ol.source.XYZ({
-        url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic25hc2hlIiwiYSI6ImRFWFVLLWcifQ.IcYEbFzFZGuPmMDAGfx4ew'
-      })
-    })
-  ],
-});
-
-var iss = new ol.Feature(new ol.geom.Point([0, 0]));
-
-iss.setStyle(
-    new ol.style.Style({
-      image: new ol.style.Icon(({
-        anchor: [0.5, 46],
-        anchorXUnits: 'fraction',
-        anchorYUnits: 'pixels',
-        opacity: 0.95,
-        src: 'static/iss.png'
-      }))
-    })
-)
-
-var vec_layer = new ol.layer.Vector({
-    source: new ol.source.Vector({
-       features: [iss]
-    })
-})
-
-map.addLayer(vec_layer);
-
-function moveIss(coords){
+/*
+ * Function to creating ISS.
+ * Args:
+ *  coords: Initial coordinates (decimal degree).
+ */
+function create_ISS(coords){
   data = JSON.parse(coords);
   lat = data[0];
   lon = data[1];
-  console.log('Moving ISS to ' + lat + ', ' + lon);
-  iss.set('geometry', new ol.geom.Point(getPointFromLongLat(lon, lat)));
+
+	iss_icon = L.icon({
+    iconUrl: 'static/iss.png',
+    iconRetinaUrl: 'iss@2x.png',
+    iconSize: [128, 128],
+	});
+
+	iss = L.marker([lat, lon], {icon: iss_icon})
+  iss.addTo(map);
 }
 
-function getPointFromLongLat (long, lat) {
-      return ol.proj.transform([long, lat], 'EPSG:4326', 'EPSG:3857')
+/*
+ * Function to moving ISS.
+ * Args:
+ *  coords: coordinates to move (decimal degree).
+ */
+
+function move_ISS(coords){
+  data = JSON.parse(coords);
+  lat = data[0];
+  lon = data[1];
+
+	iss.setLatLng([lat, lon])
 }
 
+/*
+ * Function for sending http request. Used for receiving current ISS position
+ * from API.
+ * Args:
+ *  url: API-request url.
+ *  callback: callback function after recieving response.
+ */
 function httpGet(url, callback)
 {
     var xmlHttp = new XMLHttpRequest();
@@ -66,15 +51,29 @@ function httpGet(url, callback)
     xmlHttp.send(null);
 }
 
+/*
+ * Main section.
+ */
 
-// httpGet(
-  // window.location.href + 'api',
-  // function(args){console.log(args);}
-// );
+/*
+ * Initialize map.
+ */
+var map = L.map('mapid').setView([0, 0], 3);
 
+L.tileLayer(
+	'https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic25hc2hlIiwiYSI6ImRFWFVLLWcifQ.IcYEbFzFZGuPmMDAGfx4ew', 
+	{
+    maxZoom: 18
+  }
+).addTo(map);
+
+var iss;
+
+// Create ISS on the map
+httpGet(window.location.href + 'api', create_ISS);
+// Update ISS position every 3 seconds.
 setInterval(
-  //function(){console.log('Hello')},
-  function(){httpGet(window.location.href + 'api', moveIss)},
+  function(){httpGet(window.location.href + 'api', move_ISS)},
   3000
 );
   

@@ -11,12 +11,11 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <!-- End of Bootstrap -->
 
-  <!-- Include OpenLayers -->
-  <link rel="stylesheet" href="http://openlayers.org/en/v3.17.1/css/ol.css" 
-    type="text/css">
-  <script src="http://openlayers.org/en/v3.17.1/build/ol.js" 
-    type="text/javascript"></script>
-  <!-- End of OpenLayers -->
+  <!-- Include LeafLet -->
+  <link href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css" 
+    rel="stylesheet"/>
+  <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+  <!-- End of LeafLet -->
 
   <link rel="stylesheet" href="static/style.css" type="text/css">
 
@@ -24,13 +23,11 @@
 </head>
 
 <body>
+
   {% block body %}{% endblock body %}
 
-  <!-- Include it here because otherwise map don't shown =(. -->
   <script src="static/script.js" type="text/javascript"></script>
-  <script>
-    // move_iss({{ data.latitude }}, {{ data.longitude }});
-  </script>
+
 </body>
 
 </html>
