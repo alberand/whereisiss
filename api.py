@@ -11,7 +11,7 @@ class Source:
         # only about ISS.
         self.sat_id = 25544
 
-        self.data_set = None
+        self.data_set = dict()
 
         # Get data from API
         self._update()
@@ -40,16 +40,35 @@ class Source:
         '''
         pass
 
+    def get_people(self):
+        '''
+        Returns information about number of people in space.
+        Returns:
+            Dictionary object.
+        '''
+        return self.data_set['people']
+
     def _update(self):
         '''
         Update internal data structure.
         '''
-        url = 'https://api.wheretheiss.at/v1/satellites/{}'
-        response = urllib.request.urlopen(url.format(self.sat_id))
+        urls = [
+            'https://api.wheretheiss.at/v1/satellites/{}'.format(self.sat_id),
+            'http://api.open-notify.org/astros.json'
+        ]
+
+        for url in urls:
+            response = self.make_request(url)
+            if response:
+                self.data_set.update(response)
+
+    def make_request(self, url):
+        response = urllib.request.urlopen(url)
 
         if response:
-            self.data_set = json.loads(str(response.read(), 'utf-8'))
+            response = json.loads(str(response.read(), 'utf-8'))
+            return response
         else:
-            app.logger.warning('Can\'t receive information from API.')
-
-
+            app.logger.warning('Can\'t receive information from API.\n'
+                    'URL is {}'.format(url))
+            return None

@@ -70,10 +70,48 @@ L.tileLayer(
 var iss;
 
 // Create ISS on the map
-httpGet(window.location.href + 'api', create_ISS);
+httpGet(window.location.href + 'coords', create_ISS);
 // Update ISS position every 3 seconds.
 setInterval(
-  function(){httpGet(window.location.href + 'api', move_ISS)},
+  function(){httpGet(window.location.href + 'coords', move_ISS)},
   3000
 );
   
+// Adding info window
+var info = L.control();
+
+info.onAdd = function (map) {
+  this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+  this.update();
+  return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+info.update = function (props) {
+  console.log(props);
+  if(typeof props !== "undefined"){
+    data = JSON.parse(props);
+  
+    var str = ''; 
+    for(i = 0; i < data.length; i++){
+      str = str + '<div class="astr">' + data[i]['name'] + '</div>'
+    }
+
+    this._div.innerHTML = '<h4>People in space:</h4>' + str
+  }
+};
+
+info.addTo(map);
+
+// Update information window about people in space
+httpGet(window.location.href + 'people', function(response){
+  info.update(response);  
+});
+setInterval(
+  function(){
+    httpGet(window.location.href + 'people', function(response){
+      info.update(response);  
+    })
+  },
+  86400000 // Every 24 hour
+);
