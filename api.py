@@ -71,7 +71,7 @@ class Source:
         response = urlrequest.urlopen(url)
 
         if response:
-            response = json.loads(str(response.read()))
+            response = json.loads(str(response.read(), 'UTF-8'))
             return response
         else:
             app.logger.warning('Can\'t receive information from API.\n'
