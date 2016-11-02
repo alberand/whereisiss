@@ -68,12 +68,16 @@ class Source:
                 self.data_set.update(response)
 
     def make_request(self, url):
-        response = urlrequest.urlopen(url)
-
-        if response:
-            response = json.loads(str(response.read(), 'UTF-8'))
-            return response
-        else:
-            app.logger.warning('Can\'t receive information from API.\n'
-                    'URL is {}'.format(url))
-            return None
+        try:
+            with urlrequest.urlopen(url) as response:
+                if response:
+                    response = json.loads(str(response.read(), 'UTF-8'))
+                    return response
+                else:
+                    app.logger.warning('Can\'t receive information from API.\n'
+                            'URL is {}'.format(url))
+                    return None
+        except urlrequest.HTTPError:
+            app.logger.warning('HTTP error.')
+        except urlrequest.URLError:
+            app.logger.warning('URL error.')
