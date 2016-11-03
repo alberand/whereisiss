@@ -73,7 +73,9 @@ var iss;
 httpGet(window.location.href + 'coords', create_ISS);
 // Update ISS position every 3 seconds.
 setInterval(
-  function(){httpGet(window.location.href + 'coords', move_ISS)},
+  function(){
+    console.log("Getting new coords."); 
+    httpGet(window.location.href + 'coords', move_ISS)},
   3000
 );
   

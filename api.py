@@ -58,26 +58,23 @@ class Source:
         Update internal data structure.
         '''
         urls = [
-            'https://api.wheretheiss.at/v1/satellites/{}'.format(self.sat_id),
-            'http://api.open-notify.org/astros.json'
+            'https://api.wheretheiss.at/v1/satellites/{}'.format(self.sat_id)
+            # 'http://api.open-notify.org/astros.json'
         ]
 
         for url in urls:
             response = self.make_request(url)
             if response:
                 self.data_set.update(response)
+            else:
+                print('Fail to access API.')
 
     def make_request(self, url):
-        try:
-            with urlrequest.urlopen(url) as response:
-                if response:
-                    response = json.loads(str(response.read(), 'UTF-8'))
-                    return response
-                else:
-                    app.logger.warning('Can\'t receive information from API.\n'
-                            'URL is {}'.format(url))
-                    return None
-        except urlrequest.HTTPError:
-            app.logger.warning('HTTP error.')
-        except urlrequest.URLError:
-            app.logger.warning('URL error.')
+        with urlrequest.urlopen(url) as response:
+            if response:
+                response = json.loads(str(response.read(), 'UTF-8'))
+                return response
+            else:
+                app.logger.warning('Can\'t receive information from API.\n'
+                        'URL is {}'.format(url))
+                return None
