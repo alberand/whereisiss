@@ -17,6 +17,8 @@ class Source:
         self.sat_id = 25544
 
         self.data_set = dict()
+        self.data_set.update(
+                self.make_request('http://api.open-notify.org/astros.json'))
 
         # Get data from API
         self._update()
