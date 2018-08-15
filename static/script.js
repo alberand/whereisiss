@@ -15,7 +15,14 @@ function create_ISS(coords){
     iconSize: [128, 128],
 	});
 
-	iss = L.marker([lat, lon], {icon: iss_icon})
+  iss = new L.Marker([lat, lon], {
+    icon: new L.DivIcon({
+        className: 'iss-icon',
+        html: '<span class="my-div-span" style="font-size: 42px; text-shadow: 0px 0px 2px black;">🛰️</span>'
+    })
+  });
+
+	// iss = L.marker([lat, lon], {icon: iss_icon})
   iss.addTo(map);
 }
 
@@ -59,11 +66,15 @@ function httpGet(url, callback)
  * Initialize map.
  */
 var map = L.map('mapid').setView([0, 0], 3);
+map.setMaxBounds( [[-90,-180], [90,180]] )
 
 L.tileLayer(
 	'https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic25hc2hlIiwiYSI6ImRFWFVLLWcifQ.IcYEbFzFZGuPmMDAGfx4ew', 
 	{
-    maxZoom: 18
+    maxZoom: 18,
+    minZoom: 3,
+    maxBoundsViscosity: 0.5
+    //noWrap: true
   }
 ).addTo(map);
 
@@ -96,7 +107,7 @@ info.update = function (props) {
   
     var str = ''; 
     for(i = 0; i < data.length; i++){
-      str = str + '<div class="astr">' + data[i]['name'] + '</div>'
+      str = str + '<div class="astr"> 👨‍🚀 ' + data[i]['name'] + '</div>'
     }
 
     this._div.innerHTML = '<h4>People in space:</h4>' + str
