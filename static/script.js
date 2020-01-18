@@ -21,7 +21,7 @@ function create_ISS(coords){
     var station = new L.Marker([lat, lon], {
       icon: new L.DivIcon({
           className: 'iss-icon',
-          html: '<span class="my-div-span" style="font-size: 42px; text-shadow: 0px 0px 2px black;">🛰️</span>'
+          html: '<span id="iss">🛰️</span>'
       })
     });
 

@@ -26,3 +26,8 @@
   color: #1e1e1e;
   text-decoration: none;
 }
+
+#iss {
+  font-size: 82px; 
+  text-shadow: 5px 0px 5px black;
+}
