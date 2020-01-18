@@ -21,3 +21,8 @@
 .astr {
   padding: 6px;
 }
+
+.astr a {
+  color: #1e1e1e;
+  text-decoration: none;
+}
