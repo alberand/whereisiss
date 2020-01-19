@@ -18,11 +18,12 @@
   color: #777;
 }
 
-.astr {
+.item {
   padding: 6px;
+  color: #1e1e1e;
 }
 
-.astr a {
+.item a {
   color: #1e1e1e;
   text-decoration: none;
 }

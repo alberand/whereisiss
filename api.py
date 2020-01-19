@@ -1,4 +1,5 @@
 import json
+import time
 # Fix for Python 2
 try:
         import urllib.request as urlrequest
@@ -9,19 +10,25 @@ from flask import Flask
 
 app = Flask(__name__)
 
+ASTROS_URL = 'http://api.open-notify.org/astros.json'
+# Satelitte NORAD id. For now (09.09.2016) API providing information 
+# only about ISS.
+# 25544 is for ISS
+ISS_URL = 'https://api.wheretheiss.at/v1/satellites/25544'
+
 class Source:
+    '''
+    Assumption:
+        - Coordinates are requiested at least once a day
+    '''
 
     def __init__(self):
-        # Satelitte NORAD id. For now (09.09.2016) API providing information 
-        # only about ISS.
-        self.sat_id = 25544
-
-        self.data_set = dict()
-        self.data_set.update(
-                self.make_request('http://api.open-notify.org/astros.json'))
-
-        # Get data from API
-        self._update()
+        self.people_last_update = time.time()
+        self.people = dict()
+        self.people.update(self.make_request(ASTROS_URL))
+        self.fullinfo_last_update = time.time()
+        self.fullinfo = dict()
+        self.fullinfo.update(self.make_request(ISS_URL))
 
     def get_iss_info(self):
         '''
@@ -29,7 +36,8 @@ class Source:
         Returns:
             Dictionary.
         '''
-        return self.data_set
+        self.__update()
+        return self.fullinfo
 
     def get_iss_coords(self):
         '''
@@ -37,15 +45,8 @@ class Source:
         Returns:
             List in format [latitude, longitude]
         '''
-        return [self.data_set['latitude'], self.data_set['longitude']]
-
-    def get_iss_speed(self):
-        '''
-        Returns satellite speed.
-        Returns:
-            Float number in km/h.
-        '''
-        pass
+        self.__update()
+        return [self.fullinfo['latitude'], self.fullinfo['longitude']]
 
     def get_people(self):
         '''
@@ -53,23 +54,20 @@ class Source:
         Returns:
             Dictionary object.
         '''
-        return self.data_set['people']
+        self.__update()
+        return self.people
 
-    def _update(self):
+    def __update(self):
         '''
         Update internal data structure.
         '''
-        urls = [
-            'https://api.wheretheiss.at/v1/satellites/{}'.format(self.sat_id)
-            # 'http://api.open-notify.org/astros.json'
-        ]
+        if (time.time() - self.fullinfo_last_update) >= 3:
+            self.fullinfo_last_update = time.time()
+            self.fullinfo.update(self.make_request(ISS_URL))
 
-        for url in urls:
-            response = self.make_request(url)
-            if response:
-                self.data_set.update(response)
-            else:
-                print('Fail to access API.')
+        if (time.time() - self.people_last_update) >= 86400:
+            self.people_last_update = time.time()
+            self.people.update(self.make_request(ASTROS_URL))
 
     def make_request(self, url):
         with urlrequest.urlopen(url) as response:

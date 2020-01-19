@@ -4,7 +4,7 @@
  * Args:
  *  coords: Initial coordinates (decimal degree).
  */
-function create_ISS(coords){
+function createISS(coords){
   data = JSON.parse(coords);
   lat = data[0];
   lon = data[1];
@@ -37,7 +37,7 @@ function create_ISS(coords){
  *  coords: coordinates to move (decimal degree).
  */
 
-function move_ISS(coords){
+function moveISS(coords){
   data = JSON.parse(coords);
   lat = data[0];
   lon = data[1];
@@ -90,12 +90,13 @@ L.tileLayer(
 var mul_iss = [];
 
 // Create ISS on the map
-httpGet(window.location.href + 'coords', create_ISS);
+httpGet(window.location.href + 'coords', createISS);
+
 // Update ISS position every 3 seconds.
 setInterval(
   function(){
     console.log("Getting new coords."); 
-    httpGet(window.location.href + 'coords', move_ISS)},
+    httpGet(window.location.href + 'coords', moveISS)},
   3000
 );
   
@@ -110,14 +111,13 @@ info.onAdd = function (map) {
 
 // method that we will use to update the control based on feature properties passed
 info.update = function (props) {
-  console.log(props);
   if(typeof props !== "undefined"){
-    data = JSON.parse(props);
-  
+    data = JSON.parse(props)['people'];
+
     var str = ''; 
     for(i = 0; i < data.length; i++){
       var url = data[i]['name'].replace(' ', '+')
-      str = str + '<div class="astr"><a  target="_blank" rel="noopener noreferrer" href="https://duckduckgo.com/?q=' + url + '&t=ffab&ia=news&iax=about"> 👨‍🚀 ' + data[i]['name'] + '</a></div>'
+      str += '<div class="item"><a  target="_blank" rel="noopener noreferrer" href="https://duckduckgo.com/?q=' + url + '&t=ffab&ia=news&iax=about"> 👨‍🚀 ' + data[i]['name'] + '</a></div>'
     }
 
     this._div.innerHTML = '<h4>People in space:</h4>' + str
@@ -137,5 +137,48 @@ setInterval(
       info.update(response);  
     })
   },
-  86400000 // Every 24 hour
+  // 86400000 // Every 24 hour
+  1000
+);
+
+// Adding info window
+var infoiss = L.control({ position : 'bottomright' });
+
+infoiss.onAdd = function (map) {
+  this._div = L.DomUtil.create('div', 'info'); // create a div with a class "infoiss"
+  this.update();
+  return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+infoiss.update = function (issfullinfo) {
+  if(typeof issfullinfo !== "undefined"){
+    data = JSON.parse(issfullinfo);
+
+    var str = ''; 
+    var array_keys = ['latitude', 'longitude', 'altitude', 'velocity'];
+
+    str += '<div class="item"> Latitude: ' + data['latitude'] + '</div>'
+    str += '<div class="item"> Longitude: ' + data['longitude'] + '</div>'
+    str += '<div class="item"> Altitude: ' + Number(data['altitude']).toFixed(2) + ' km</div>'
+    str += '<div class="item"> Velocity: ' + Number(data['velocity']).toFixed(2) + ' km/h</div>'
+
+    this._div.innerHTML = '<h4>Information:</h4>' + str
+  }
+};
+
+infoiss.addTo(map);
+
+// Update information window about people in space
+httpGet(window.location.href + 'issfullinfo', function(response){
+  infoiss.update(response);  
+});
+
+setInterval(
+  function(){
+    httpGet(window.location.href + 'issfullinfo', function(response){
+      infoiss.update(response);  
+    })
+  },
+  3000 // Every 24 hour
 );
