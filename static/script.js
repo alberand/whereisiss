@@ -42,6 +42,10 @@ function moveISS(coords){
   lat = data[0];
   lon = data[1];
 
+  if(follow){
+    map.panTo(new L.LatLng(lat, lon));
+  }
+
   lon = lon - 360;
   for(var i = 0; i < mul_iss.length; i++){
 	  mul_iss[i].setLatLng([lat, lon])
@@ -71,6 +75,9 @@ function httpGet(url, callback)
  * Main section.
  *=============================================================================/
 
+/* Set to 'true' camera will follow ISS */
+follow = false
+
 /*
  * Initialize map.
  */
@@ -99,7 +106,10 @@ setInterval(
     httpGet(window.location.href + 'coords', moveISS)},
   3000
 );
-  
+
+//==============================================================================
+// Add windows with people in space
+//==============================================================================
 // Adding info window
 var info = L.control();
 
@@ -137,10 +147,12 @@ setInterval(
       info.update(response);  
     })
   },
-  // 86400000 // Every 24 hour
-  1000
+  86400000 // Every 24 hour
 );
 
+//==============================================================================
+// Add windows with information about ISS
+//==============================================================================
 // Adding info window
 var infoiss = L.control({ position : 'bottomright' });
 
@@ -182,3 +194,10 @@ setInterval(
   },
   3000 // Every 24 hour
 );
+
+//==============================================================================
+// Add "Follow" mode button 
+//==============================================================================
+L.easyButton('fa-crosschair fa', function(btn, map){
+    follow = true
+  }).addTo( map );
