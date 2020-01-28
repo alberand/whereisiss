@@ -33,11 +33,11 @@
         name: virtualenv
   - name: Create ISSMAP user
     user:
-        name: {{ user }}
+        name: "{{ user }}"
   - name: Clone git repository
     git:
         repo: git@gitlab.com:alberand/iss-tracker.git
-        dest: /home/{{ user }}/issmap
+        dest: "/home/{{ user }}/issmap"
   - name: Copy uWSGI init script
     copy:
         src: issmap.conf
@@ -46,7 +46,7 @@
     shell: start issmap
   - name: Link NGINX config
     file:
-        src: /home/{{ user }}/{{ repo-dir }}/issmap.nginx
+        src: "/home/{{ user }}/{{ repo-dir }}/issmap.nginx"
         dest: /etc/nginx/sites-available/issmap
         state: link
   - name: Restart NGINX
