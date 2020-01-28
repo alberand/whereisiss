@@ -7,8 +7,6 @@
   vars:
     user: issmap-user
     repo-dir: issmap
-    http_port: 80
-    max_clients: 200
   tasks:
   - name: ensure required apps are at the latest version
     apt:
