@@ -7,3 +7,5 @@ are currently in the space.
 
 If you have some suggestion or want to add something new create a pull request
 =)
+
+https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uwsgi-and-nginx-on-ubuntu-14-04
