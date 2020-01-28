@@ -6,7 +6,7 @@
   become_method: su
   vars:
     user: issmap-user
-    repo-dir: issmap
+    repo_dir: issmap
   tasks:
   - name: ensure required apps are at the latest version
     apt:
@@ -44,7 +44,7 @@
     shell: start issmap
   - name: Link NGINX config
     file:
-        src: "/home/{{ user }}/{{ repo-dir }}/issmap.nginx"
+        src: "/home/{{ user }}/{{ repo_dir }}/issmap.nginx"
         dest: /etc/nginx/sites-available/issmap
         state: link
   - name: Restart NGINX
