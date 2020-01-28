@@ -1,0 +1,9 @@
+server {
+    listen 80;
+    server_name ${ISSMAP_HOST};
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:/home/issmap/issmap/issmap.sock;
+    }
+}
