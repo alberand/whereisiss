@@ -1,0 +1,53 @@
+---
+- hosts: wedos
+  become: yes
+  remote_user: alberand
+  become_user: root
+  become_method: su
+  vars:
+    user: issmap-user
+    repo-dir: issmap
+    http_port: 80
+    max_clients: 200
+  tasks:
+  - name: ensure required apps are at the latest version
+    apt:
+      name: "{{ item }}"
+      state: latest
+    loop:
+      - vim
+      - gcc
+      - mc
+      - python
+      - python-pip
+      - git
+      - ntp
+      - htop
+      - wget
+      - mariadb-server
+      - zsh
+      - python-dev
+      - nginx
+  - name: Install Python's virtualenv
+    pip:
+        name: virtualenv
+  - name: Create ISSMAP user
+    user:
+        name: {{ user }}
+  - name: Clone git repository
+    git:
+        repo: git@gitlab.com:alberand/iss-tracker.git
+        dest: /home/{{ user }}/issmap
+  - name: Copy uWSGI init script
+    copy:
+        src: issmap.conf
+        desc: /etc/init/issmap.conf
+  - name: Start uWSGI
+    shell: start issmap
+  - name: Link NGINX config
+    file:
+        src: /home/{{ user }}/{{ repo-dir }}/issmap.nginx
+        dest: /etc/nginx/sites-available/issmap
+        state: link
+  - name: Restart NGINX
+    shell: service nginx restart
