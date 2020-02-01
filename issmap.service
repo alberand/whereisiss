@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve ISSMAP
+After=network.target
+
+[Service]
+User=issmap-user
+Group=www-data
+WorkingDirectory=/home/issmap-user/issmap
+Environment="PATH=/home/issmap-user/issmap/venv/bin"
+ExecStart=/home/issmap-user/issmap/venv/bin/uwsgi --ini issmap.ini
+
+[Install]
+WantedBy=multi-user.target
