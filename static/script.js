@@ -187,37 +187,47 @@ L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(
 // Add info elements if not mobile
 //==============================================================================
 function addNonMobileElements(){
-  if( screen.width > 480 ) { // is mobile 
+  if( screen.width > 480 && screen.height > 480) { // is mobile 
+    console.log('Switched to desktop')
     info.addTo(map);
     infoiss.addTo(map);
 
-  // Update information window about people in space
-  httpGet(window.location.href + 'people', function(response){
-    info.update(response);  
-  });
-  
-  setInterval(
-    function(){
-      httpGet(window.location.href + 'people', function(response){
-        info.update(response);  
-      })
-    },
-    86400000 // Every 24 hour
-  );
+    // Update information window about people in space
+    httpGet(window.location.href + 'people', function(response){
+      info.update(response);  
+    });
+    
+    var infoRefreshTimer = setInterval(
+      function(){
+        httpGet(window.location.href + 'people', function(response){
+          info.update(response);  
+        })
+      },
+      86400000 // Every 24 hour
+    );
 
-  // Update information window about people in space
-  httpGet(window.location.href + 'issfullinfo', function(response){
-    infoiss.update(response);  
-  });
-  
-  setInterval(
-    function(){
-      httpGet(window.location.href + 'issfullinfo', function(response){
-        infoiss.update(response);  
-      })
-    },
-    3000 // Every 24 hour
-  );
+    // Update information window about people in space
+    httpGet(window.location.href + 'issfullinfo', function(response){
+      infoiss.update(response);  
+    });
+    
+    var infoissRefreshTimer = setInterval(
+      function(){
+        httpGet(window.location.href + 'issfullinfo', function(response){
+          infoiss.update(response);  
+        })
+      },
+      3000 // Every 24 hour
+    );
 
+  } else {
+    console.log('Switched to mobile')
+    info.remove();
+    infoiss.remove();
+    clearInterval(infoRefreshTimer);
+    clearInterval(infoissRefreshTimer);
   }
 }
+
+// Call it once to open pop-ups if we are on desktop
+addNonMobileElements()
