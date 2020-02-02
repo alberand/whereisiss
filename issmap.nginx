@@ -1,9 +1,9 @@
 server {
     listen 80;
-    server_name ${ISSMAP_HOST};
+    server_name {{ host_ip }};
 
     location / {
-        include uwsgi_params;
-        uwsgi_pass unix:/home/issmap/issmap/issmap.sock;
+        include {{ project_home }}/uwsgi_params;
+        uwsgi_pass unix: {{ project_home }}/{{ project_name }}.sock;
     }
 }
