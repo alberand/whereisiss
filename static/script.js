@@ -25,10 +25,10 @@ function createISS(coords){
       })
     });
 
-    var tooltip = station.bindTooltip("my tooltip text", {
-      permanent: true,
-      direction: "bottom"
-    }).openTooltip();
+    // var tooltip = station.bindTooltip("my tooltip text", {
+      // permanent: true,
+      // direction: "bottom"
+    // }).openTooltip();
 
 
     mul_iss[i] = station;
