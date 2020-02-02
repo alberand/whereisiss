@@ -48,6 +48,8 @@ function moveISS(coords){
   lat = data[0];
   lon = data[1];
 
+  console.log("Got new coords [" + lat + ", " + lon + "]"); 
+
   if(follow){
     map.panTo(new L.LatLng(lat, lon));
   }
@@ -108,7 +110,6 @@ httpGet(window.location.href + 'coords', createISS);
 // Update ISS position every 3 seconds.
 setInterval(
   function(){
-    console.log("Getting new coords."); 
     httpGet(window.location.href + 'coords', moveISS)},
   3000
 );
