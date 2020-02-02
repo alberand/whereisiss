@@ -5,8 +5,13 @@
   become_user: root
   become_method: su
   vars:
-    user: issmap-user
-    repo_dir: issmap
+    ansible_python_interpreter: /usr/bin/python3
+    project_name: issmap
+    deploy_user: "{{ project_name }}-user"
+    repo_dir: "{{ project_name }}"
+    project_home: "/home/{{ deploy_user }}/{{ repo_dir }}"
+    host_ip: "{{ ansible_default_ipv4.address }}"
+    repo: "git@gitlab.com:alberand/{{ project_name }}.git"
   tasks:
   - name: ensure required apps are at the latest version
     apt:
@@ -18,6 +23,7 @@
       - mc
       - python
       - python-pip
+      - python3-pip
       - git
       - ntp
       - htop
@@ -28,24 +34,71 @@
       - nginx
   - name: Install Python's virtualenv
     pip:
-        name: virtualenv
-  - name: Create ISSMAP user
+      name: virtualenv
+  - name: Create project user
     user:
-        name: "{{ user }}"
+      name: "{{ deploy_user }}"
+      groups: www-data
+      append: yes
+  - name: Ensure .ssh directory exists.
+    file: 
+      dest: "/root/.ssh"
+      mode: 0700 
+      owner: root
+      state: directory
+  - name: Copy SSH private key
+    copy:
+      src: "./id_rsa" 
+      dest: "/root/.ssh/id_rsa"
+      mode: 0600
+      owner: root
+  - name: Copy SSH public key
+    copy:
+      src: "./id_rsa.pub" 
+      dest: "/root/.ssh/id_rsa.pub"
+      mode: 0644
+      owner: "root"
   - name: Clone git repository
     git:
-        repo: git@gitlab.com:alberand/iss-tracker.git
-        dest: "/home/{{ user }}/issmap"
+      repo: "{{ repo }}"
+      dest: "{{ project_home }}"
+      clone: yes
+      depth: 1
+      accept_hostkey: yes
+  - name: Recursively change ownership of a git directory
+    file:
+      path:  "{{ project_home }}"
+      state: directory
+      recurse: yes
+      owner: "{{ deploy_user }}"
+      group: "{{ deploy_user }}" 
+  - name: Manually create the initial virtualenv
+    command:
+      cmd: "python -m virtualenv {{ project_home }}/venv -p python3"
+      creates: "{{ project_home }}/venv"
+  - name: Install Python requirements
+    pip:
+      requirements: "{{ project_home }}/requirements.txt"
+      virtualenv: "{{ project_home }}/venv"
   - name: Copy uWSGI init script
     copy:
-        src: issmap.conf
-        desc: /etc/init/issmap.conf
+      src: "{{ project_name }}.service"
+      dest: "/etc/systemd/system/{{ project_name }}.service"
   - name: Start uWSGI
-    shell: start issmap
+    systemd:
+        name: "{{ project_name }}"
+        state: started
+        enabled: yes
   - name: Link NGINX config
+    template:
+      src: "{{ project_name }}.nginx"
+      dest: "/etc/nginx/sites-available/{{ project_name }}"
+  - name: Enabled Nginx config
     file:
-        src: "/home/{{ user }}/{{ repo_dir }}/issmap.nginx"
-        dest: /etc/nginx/sites-available/issmap
-        state: link
+      src: "/etc/nginx/sites-available/{{ project_name }}"
+      dest: "/etc/nginx/sites-enabled/{{ project_name }}"
+      state: link
   - name: Restart NGINX
-    shell: service nginx restart
+    service:
+        name: nginx
+        state: restarted
