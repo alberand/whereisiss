@@ -25,6 +25,12 @@ function createISS(coords){
       })
     });
 
+    var tooltip = station.bindTooltip("my tooltip text", {
+      permanent: true,
+      direction: "bottom"
+    }).openTooltip();
+
+
     mul_iss[i] = station;
     station.addTo(map);
     lon = lon + 360;
@@ -168,7 +174,13 @@ infoiss.update = function (issfullinfo) {
 // Add "Follow" mode button 
 //==============================================================================
 L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(btn, map){
-    follow = true
+    follow = !follow;
+    button = document.getElementsByClassName('easy-button-button leaflet-bar-part leaflet-interactive unnamed-state-active')[0];
+    if(follow){
+      button.setAttribute("style", "background-color: lemonchiffon;");
+    } else {
+      button.removeAttribute("style");
+    }
   }).addTo( map );
 
 //==============================================================================
