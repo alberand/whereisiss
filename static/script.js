@@ -134,22 +134,6 @@ info.update = function (props) {
   }
 };
 
-info.addTo(map);
-
-// Update information window about people in space
-httpGet(window.location.href + 'people', function(response){
-  info.update(response);  
-});
-
-setInterval(
-  function(){
-    httpGet(window.location.href + 'people', function(response){
-      info.update(response);  
-    })
-  },
-  86400000 // Every 24 hour
-);
-
 //==============================================================================
 // Add windows with information about ISS
 //==============================================================================
@@ -179,21 +163,6 @@ infoiss.update = function (issfullinfo) {
   }
 };
 
-infoiss.addTo(map);
-
-// Update information window about people in space
-httpGet(window.location.href + 'issfullinfo', function(response){
-  infoiss.update(response);  
-});
-
-setInterval(
-  function(){
-    httpGet(window.location.href + 'issfullinfo', function(response){
-      infoiss.update(response);  
-    })
-  },
-  3000 // Every 24 hour
-);
 
 //==============================================================================
 // Add "Follow" mode button 
@@ -201,3 +170,42 @@ setInterval(
 L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(btn, map){
     follow = true
   }).addTo( map );
+
+//==============================================================================
+// Add info elements if not mobile
+//==============================================================================
+function addNonMobileElements(){
+  if( screen.width > 480 ) { // is mobile 
+    info.addTo(map);
+    infoiss.addTo(map);
+
+  // Update information window about people in space
+  httpGet(window.location.href + 'people', function(response){
+    info.update(response);  
+  });
+  
+  setInterval(
+    function(){
+      httpGet(window.location.href + 'people', function(response){
+        info.update(response);  
+      })
+    },
+    86400000 // Every 24 hour
+  );
+
+  // Update information window about people in space
+  httpGet(window.location.href + 'issfullinfo', function(response){
+    infoiss.update(response);  
+  });
+  
+  setInterval(
+    function(){
+      httpGet(window.location.href + 'issfullinfo', function(response){
+        infoiss.update(response);  
+      })
+    },
+    3000 // Every 24 hour
+  );
+
+  }
+}
