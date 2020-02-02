@@ -177,7 +177,7 @@ L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(
     follow = !follow;
     button = document.getElementsByClassName('easy-button-button leaflet-bar-part leaflet-interactive unnamed-state-active')[0];
     if(follow){
-      button.setAttribute("style", "background-color: lemonchiffon;");
+      button.setAttribute("style", "background-color: #ffb8b8;");
     } else {
       button.removeAttribute("style");
     }
