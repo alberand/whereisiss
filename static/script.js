@@ -198,6 +198,6 @@ setInterval(
 //==============================================================================
 // Add "Follow" mode button 
 //==============================================================================
-L.easyButton('fa-crosschair fa', function(btn, map){
+L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(btn, map){
     follow = true
   }).addTo( map );

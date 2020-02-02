@@ -32,3 +32,13 @@
   font-size: 82px; 
   text-shadow: 5px 0px 5px black;
 }
+
+#follow-mode-icon {
+  width: 30px;
+  height: 30px;
+  margin-top: -5px;
+}
+
+.leaflet-touch .leaflet-bar button {
+  padding: 0px;
+}
