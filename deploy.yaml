@@ -58,6 +58,10 @@
       dest: "/root/.ssh/id_rsa.pub"
       mode: 0644
       owner: "root"
+  - name: Make sure that systemd uWSGI service is stopped
+    systemd:
+        name: "{{ project_name }}"
+        state: stopped
   - name: Clone git repository
     git:
       repo: "{{ repo }}"
