@@ -160,9 +160,10 @@ infoiss.update = function (issfullinfo) {
 
     var str = ''; 
     var array_keys = ['latitude', 'longitude', 'altitude', 'velocity'];
-
-    str += '<div class="item"> Latitude: ' + data['latitude'] + '</div>'
-    str += '<div class="item"> Longitude: ' + data['longitude'] + '</div>'
+ 
+    str += '<div class="item"><a target="_blank" rel="noopener noreferrer" href="http://maps.google.com/maps?z=12&t=m&q=loc:' + data['latitude'] + '+' + data['longitude'] + '">' + Number(data['latitude']).toFixed(4) + ', ' + Number(data['longitude']).toFixed(4) + '</a></div>'
+    // str += '<div class="item"> Latitude: ' + data['latitude'] + '</div>'
+    // str += '<div class="item"> Longitude: ' + data['longitude'] + '</div>'
     str += '<div class="item"> Altitude: ' + Number(data['altitude']).toFixed(2) + ' km</div>'
     str += '<div class="item"> Velocity: ' + Number(data['velocity']).toFixed(2) + ' km/h</div>'
 
