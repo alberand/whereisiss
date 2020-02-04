@@ -134,7 +134,7 @@ info.update = function (props) {
     var str = ''; 
     for(i = 0; i < data.length; i++){
       var url = data[i]['name'].replace(' ', '+')
-      str += '<div class="item"><a  target="_blank" rel="noopener noreferrer" href="https://duckduckgo.com/?q=' + url + '&t=ffab&ia=news&iax=about"> 👨‍🚀 ' + data[i]['name'] + '</a></div>'
+      str += '<div class="item"><a target="_blank" rel="noopener noreferrer" href="https://duckduckgo.com/?q=' + url + '&t=ffab&ia=news&iax=about"> 👨‍🚀 ' + data[i]['name'] + '</a></div>'
     }
 
     this._div.innerHTML = '<h4>People in space:</h4>' + str
