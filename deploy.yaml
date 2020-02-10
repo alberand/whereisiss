@@ -91,8 +91,7 @@
   - name: Start uWSGI
     systemd:
         name: "{{ project_name }}"
-        state: started
-        enabled: yes
+        state: restarted
   - name: Link NGINX config
     template:
       src: "{{ project_name }}.nginx"
