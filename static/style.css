@@ -43,6 +43,7 @@ html, body, #map {
   text-shadow: 5px 0px 5px black;
 }
 
+/* Correct placement of the icon on the following mode button */
 #follow-mode-icon {
   width: 30px;
   height: 30px;
@@ -51,4 +52,10 @@ html, body, #map {
 
 .leaflet-touch .leaflet-bar button {
   padding: 0px;
+}
+
+/* Move ISS icon to the center of the marker */
+div.leaflet-marker-icon:nth-child(2) {
+  margin-left: -56px !important;
+  margin-top: -56px !important;
 }
