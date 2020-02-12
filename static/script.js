@@ -85,6 +85,8 @@ function httpGet(url, callback)
 
 /* Set to 'true' camera will follow ISS */
 follow = false
+/* Information elements exists */
+infoExist = false
 
 /*
  * Initialize map.
@@ -189,8 +191,9 @@ L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(
 // Add info elements if not mobile
 //==============================================================================
 function addNonMobileElements(){
-  if( screen.width > 480 && screen.height > 480) { // is mobile 
+  if( screen.width > 480 && screen.height > 480 && !infoExist) { // is desktop
     console.log('Switched to desktop')
+    infoExist = true
     info.addTo(map);
     infoiss.addTo(map);
 
@@ -222,12 +225,15 @@ function addNonMobileElements(){
       3000 // Every 24 hour
     );
 
-  } else {
+  } else if( screen.width < 480 && screen.height < 480) { // is mobile 
     console.log('Switched to mobile')
+    infoExist = false
     info.remove();
     infoiss.remove();
     clearInterval(infoRefreshTimer);
     clearInterval(infoissRefreshTimer);
+  } else {
+    console.log('Don\'t switch')
   }
 }
 
