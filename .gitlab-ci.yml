@@ -1,0 +1,30 @@
+stages:
+    - demo
+    - deploy
+
+demo-site:
+    stage: demo
+    timeout: 25m
+    allow_failure: true
+    tags:
+        - demo
+    before_script:
+        - python -m pip install --user virtualenv
+        - python -m virtualenv venv
+        - source venv/bin/activate
+        - python -m pip install -r requirements.txt
+    script:
+        - timeout 1m python issmap.py; test $? -eq 124 && echo Timeout
+    only:
+        - /^feature\/.*$/
+
+deploy:
+    stage: deploy
+    timeout: 25m
+    allow_failure: false
+    tags:
+        - deploy
+    script:
+        - echo "deploying"
+    only:
+        - development
