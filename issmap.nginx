@@ -1,6 +1,7 @@
 server {
     listen 80;
     server_name {{ host_ip }};
+    server_name {{ host_domain }};
 
     location / {
         include {{ project_home }}/uwsgi_params;

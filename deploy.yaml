@@ -11,6 +11,7 @@
     repo_dir: "{{ project_name }}"
     project_home: "/home/{{ deploy_user }}/{{ repo_dir }}"
     host_ip: "{{ ansible_default_ipv4.address }}"
+    host_domain: "whereisiss.com"
     repo: "git@gitlab.com:alberand/{{ project_name }}.git"
   tasks:
   - name: ensure required apps are at the latest version
