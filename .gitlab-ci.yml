@@ -17,6 +17,7 @@ demo-site:
         - timeout 1m python issmap.py; test $? -eq 124 && echo Timeout
     only:
         - /^feature\/.*$/
+        - development
 
 deploy:
     stage: deploy
