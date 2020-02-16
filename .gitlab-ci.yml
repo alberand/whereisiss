@@ -9,12 +9,12 @@ demo-site:
     tags:
         - demo
     before_script:
-        - python -m pip install --user virtualenv
-        - python -m virtualenv venv
+        - python3 -m pip install --user virtualenv
+        - python3 -m virtualenv venv
         - source venv/bin/activate
-        - python -m pip install -r requirements.txt
+        - python3 -m pip install -r requirements.txt
     script:
-        - timeout 1m python issmap.py; test $? -eq 124 && echo Timeout
+        - timeout 1m python3 issmap.py; test $? -eq 124 && echo Timeout
     only:
         - /^feature\/.*$/
         - development
