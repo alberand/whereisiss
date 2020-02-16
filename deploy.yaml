@@ -93,6 +93,7 @@
     systemd:
         name: "{{ project_name }}"
         state: restarted
+        daemon_reload: yes
   - name: Link NGINX config
     template:
       src: "{{ project_name }}.nginx"
