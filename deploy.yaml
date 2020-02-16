@@ -1,5 +1,5 @@
 ---
-- hosts: wedos
+- hosts: all
   become: yes
   remote_user: alberand
   become_user: root
