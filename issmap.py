@@ -27,4 +27,4 @@ def get_people_in_space():
     return json.dumps(data)
 
 if __name__ == "__main__":
-    app.run(host=os.environ['ISS_HOST'])
+    app.run(host=os.environ['ISSMAP_DEMO_HOST'])
