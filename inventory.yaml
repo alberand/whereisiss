@@ -1,0 +1,5 @@
+all:
+  hosts:
+    wedos:
+      ansible_host: 89.221.217.209 
+      ansible_port: 22
