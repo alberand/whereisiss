@@ -1,2 +1,2 @@
 #!/usr/bin/sh
-echo ${ISSMAP_VAULT_PASS}
+echo $ISSMAP_VAULT_PASS
