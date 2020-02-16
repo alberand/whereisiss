@@ -26,9 +26,9 @@ deploy:
     tags:
         - deploy
     script:
-        - ansible-playbook ./deploy.yaml \
+        - ansible-playbook ./deploy.yaml
           -i inventory.yaml
-          --extra-vars "ansible_become_pass=$ISSMAP_ROOT_PASS" \
+          --extra-vars "ansible_become_pass=$ISSMAP_ROOT_PASS"
           --vault-password-file vault-password-file.sh
     only:
         - development
