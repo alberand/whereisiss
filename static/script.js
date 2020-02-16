@@ -1,3 +1,7 @@
+/* Called when click on marker (ISS) */
+function onClick(e) {
+    window.open(this.options.url);
+}
 
 /*
  * Function to creating ISS.
@@ -16,13 +20,16 @@ function createISS(coords){
 	});
 
   lon = lon - 360;
+  // Add 3 ISS to allow on left and right sides
   for(var i = 0; i < 3; i++){
     console.log(lon + ' ' + lat);
     var station = new L.Marker([lat, lon], {
       icon: new L.DivIcon({
           className: 'iss-icon',
           html: '<span id="iss">🛰️</span>'
-      })
+      }),
+			url: 'http://maps.google.com/maps?z=12&t=m&q=loc:' + lat + '+' + lon
+    // str += '<div class="item"> Latitude: ' + data['latitude'] + '</div>'
     });
 
     // var tooltip = station.bindTooltip("my tooltip text", {
@@ -34,6 +41,7 @@ function createISS(coords){
     mul_iss[i] = station;
     station.addTo(map);
     lon = lon + 360;
+    mul_iss[i].on('click', onClick);
   }
 }
 
@@ -57,6 +65,8 @@ function moveISS(coords){
   lon = lon - 360;
   for(var i = 0; i < mul_iss.length; i++){
 	  mul_iss[i].setLatLng([lat, lon])
+		mul_iss[i].options.url = 'http://maps.google.com/maps?z=12&t=m&q=loc:' + lat + '+' + lon
+		console.log("New url: " + mul_iss[i].options.url)
     lon = lon + 360;
   }
 }
