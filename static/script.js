@@ -214,6 +214,12 @@ function addNonMobileElements(){
   if( screen.width > 480 && screen.height > 480 && !infoExist) { // is desktop
     console.log('Switched to desktop')
     infoExist = true
+
+    // Make element small
+    document.getElementsByClassName('leaflet-control-zoom-in')[0].classList.remove("big-control")
+    document.getElementsByClassName('leaflet-control-zoom-out')[0].classList.remove("big-control")
+    document.querySelector('.easy-button-button').classList.remove("big-control")
+
     info.addTo(map);
     infoiss.addTo(map);
 
@@ -252,6 +258,11 @@ function addNonMobileElements(){
     infoiss.remove();
     clearInterval(infoRefreshTimer);
     clearInterval(infoissRefreshTimer);
+    // Make control element bigger
+    document.getElementsByClassName('leaflet-control-zoom-in')[0].classList.add("big-control")
+    document.getElementsByClassName('leaflet-control-zoom-out')[0].classList.add("big-control")
+    document.querySelector('.easy-button-button').classList.add("big-control")
+
   } else {
     console.log('Don\'t switch')
   }
