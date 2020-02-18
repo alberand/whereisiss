@@ -66,7 +66,6 @@ function moveISS(coords){
   for(var i = 0; i < mul_iss.length; i++){
 	  mul_iss[i].setLatLng([lat, lon])
 		mul_iss[i].options.url = 'http://maps.google.com/maps?z=12&t=m&q=loc:' + lat + '+' + lon
-		console.log("New url: " + mul_iss[i].options.url)
     lon = lon + 360;
   }
 }
@@ -211,7 +210,8 @@ L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(
 // Add info elements if not mobile
 //==============================================================================
 function addNonMobileElements(){
-  if( screen.width > 480 && screen.height > 480 && !infoExist) { // is desktop
+  var width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+  if( width > 480 && !infoExist) { // is desktop
     console.log('Switched to desktop')
     infoExist = true
 
@@ -251,7 +251,7 @@ function addNonMobileElements(){
       3000 // Every 24 hour
     );
 
-  } else if( screen.width < 480 && screen.height < 480) { // is mobile 
+  } else if( width < 480) { // is mobile 
     console.log('Switched to mobile')
     infoExist = false
     info.remove();
@@ -270,3 +270,5 @@ function addNonMobileElements(){
 
 // Call it once to open pop-ups if we are on desktop
 addNonMobileElements()
+window.addEventListener('resize', addNonMobileElements)
+window.addEventListener('load', addNonMobileElements)
