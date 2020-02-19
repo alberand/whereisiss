@@ -3,11 +3,7 @@ function onClick(e) {
     window.open(this.options.url);
 }
 
-/*
- * Function to creating ISS.
- * Args:
- *  coords: Initial coordinates (decimal degree).
- */
+/* Add ISS Marker */
 function createISS(coords){
   data = JSON.parse(coords);
   lat = data[0];
@@ -21,6 +17,7 @@ function createISS(coords){
 
   lon = lon - 360;
   // Add 3 ISS to allow on left and right sides
+  // There is LeafLet parameter for copying map but it's quite laggy
   for(var i = 0; i < 3; i++){
     console.log(lon + ' ' + lat);
     var station = new L.Marker([lat, lon], {
@@ -29,14 +26,7 @@ function createISS(coords){
           html: '<span id="iss">🛰️</span>'
       }),
 			url: 'http://maps.google.com/maps?z=12&t=m&q=loc:' + lat + '+' + lon
-    // str += '<div class="item"> Latitude: ' + data['latitude'] + '</div>'
     });
-
-    // var tooltip = station.bindTooltip("my tooltip text", {
-      // permanent: true,
-      // direction: "bottom"
-    // }).openTooltip();
-
 
     mul_iss[i] = station;
     station.addTo(map);
@@ -44,12 +34,6 @@ function createISS(coords){
     mul_iss[i].on('click', onClick);
   }
 }
-
-/*
- * Function to moving ISS.
- * Args:
- *  coords: coordinates to move (decimal degree).
- */
 
 function moveISS(coords){
   data = JSON.parse(coords);
