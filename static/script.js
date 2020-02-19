@@ -196,7 +196,7 @@ infoiss.update = function (issfullinfo) {
 //==============================================================================
 // Add "Follow" mode button 
 //==============================================================================
-L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(btn, map){
+var followButton = L.easyButton('<img src="static/crosshair.svg" id="follow-mode-icon">', function(btn, map){
     follow = !follow;
     button = document.getElementsByClassName('easy-button-button leaflet-bar-part leaflet-interactive unnamed-state-active')[0];
     if(follow){
@@ -219,6 +219,10 @@ function addNonMobileElements(){
     document.getElementsByClassName('leaflet-control-zoom-in')[0].classList.remove("big-control")
     document.getElementsByClassName('leaflet-control-zoom-out')[0].classList.remove("big-control")
     document.querySelector('.easy-button-button').classList.remove("big-control")
+
+    // Set controls elements back to initial position
+    map.zoomControl.setPosition('topleft');
+    followButton.setPosition('topright');
 
     info.addTo(map);
     infoiss.addTo(map);
@@ -258,11 +262,15 @@ function addNonMobileElements(){
     infoiss.remove();
     clearInterval(infoRefreshTimer);
     clearInterval(infoissRefreshTimer);
+    // Move control elements to the right side
+    map.zoomControl.setPosition('topright');
+    followButton.setPosition('topright');
+    // Change of position should preceed addition of new classes as
+    // setPosition() resets classList
     // Make control element bigger
     document.getElementsByClassName('leaflet-control-zoom-in')[0].classList.add("big-control")
     document.getElementsByClassName('leaflet-control-zoom-out')[0].classList.add("big-control")
     document.querySelector('.easy-button-button').classList.add("big-control")
-
   } else {
     console.log('Don\'t switch')
   }
