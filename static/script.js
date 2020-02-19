@@ -206,7 +206,7 @@ function addNonMobileElements(){
 
     // Set controls elements back to initial position
     map.zoomControl.setPosition('topleft');
-    followButton.setPosition('topright');
+    followButton.setPosition('topleft');
 
     info.addTo(map);
     infoiss.addTo(map);
