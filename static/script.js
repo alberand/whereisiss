@@ -109,16 +109,6 @@ setInterval(
   3000
 );
 
-// Add day/night overlay
-var t = L.terminator()
-t.addTo(map)
-setInterval(function(){updateTerminator(t)}, 500);
-function updateTerminator(t) {
-    var t2 = L.terminator();
-    t.setLatLngs(t2.getLatLngs());
-    t.redraw();
-}
-
 //==============================================================================
 // Add windows with people in space
 //==============================================================================
@@ -191,6 +181,16 @@ var followButton = L.easyButton('<img src="static/crosshair.svg" id="follow-mode
   }).addTo( map );
 
 //==============================================================================
+// Create terminator
+//==============================================================================
+var terminator = L.terminator()
+function updateTerminator(t) {
+    var t2 = L.terminator();
+    t.setLatLngs(t2.getLatLngs());
+    t.redraw();
+}
+
+//==============================================================================
 // Add info elements if not mobile
 //==============================================================================
 function addNonMobileElements(){
@@ -210,6 +210,11 @@ function addNonMobileElements(){
 
     info.addTo(map);
     infoiss.addTo(map);
+
+    // Add day/night overlay
+    // It's too heavy for mobile
+    terminator.addTo(map)
+    var terminatorRefreshTimer = setInterval(function(){updateTerminator(terminator)}, 1000);
 
     // Update information window about people in space
     httpGet(window.location.href + 'people', function(response){
@@ -241,11 +246,14 @@ function addNonMobileElements(){
 
   } else if( width < 480) { // is mobile 
     console.log('Switched to mobile')
+    // Remove all elements as they eat screen or laggy (terminator)
     infoExist = false
     info.remove();
     infoiss.remove();
+    terminator.remove()
     clearInterval(infoRefreshTimer);
     clearInterval(infoissRefreshTimer);
+    clearInterval(terminatorRefreshTimer);
     // Move control elements to the right side
     map.zoomControl.setPosition('topright');
     followButton.setPosition('topright');
