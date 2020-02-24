@@ -47,7 +47,7 @@ html, body, #map {
 #follow-mode-icon {
   width: 30px;
   height: 30px;
-  margin-top: -5px;
+  margin-top: -1px;
 }
 
 .leaflet-touch .leaflet-bar button {
