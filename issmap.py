@@ -11,11 +11,6 @@ def main():
     template = 'index.html'
     return render_template(template, data=src.get_iss_info())
 
-@app.route("/coords")
-def get_iss_coords():
-    data = src.get_iss_coords()
-    return json.dumps(data)
-
 @app.route("/issfullinfo")
 def get_iss_full_info():
     data = src.get_iss_info()

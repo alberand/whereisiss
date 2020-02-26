@@ -4,11 +4,7 @@ function onClick(e) {
 }
 
 /* Add ISS Marker */
-function createISS(coords){
-  data = JSON.parse(coords);
-  lat = data[0];
-  lon = data[1];
-
+function createISS(lat, lon){
 	iss_icon = L.icon({
     iconUrl: 'static/iss.png',
     iconRetinaUrl: 'iss@2x.png',
@@ -35,11 +31,7 @@ function createISS(coords){
   }
 }
 
-function moveISS(coords){
-  data = JSON.parse(coords);
-  lat = data[0];
-  lon = data[1];
-
+function moveISS(lat, lon){
   console.log("Got new coords [" + lat + ", " + lon + "]"); 
 
   if(follow){
@@ -101,12 +93,25 @@ var mul_iss = [];
 
 // Create ISS on the map
 httpGet(window.location.href + 'coords', createISS);
+httpGet(window.location.href + 'issfullinfo', function(response){
+  data = JSON.parse(response);
+
+  lat = data['latitude'];
+  lon = data['longitude'];
+  createISS(lat, lon);  
+});
 
 // Update ISS position every 3 seconds.
-setInterval(
-  function(){
-    httpGet(window.location.href + 'coords', moveISS)},
-  3000
+setInterval(function(){
+  httpGet(window.location.href + 'issfullinfo', function(response){
+    data = JSON.parse(response);
+
+    lat = data['latitude'];
+    lon = data['longitude'];
+    moveISS(lat, lon);  
+    infoiss.update(data);  
+  })},
+  3000 // [ms]
 );
 
 //==============================================================================
@@ -117,23 +122,19 @@ var info = L.control();
 
 info.onAdd = function (map) {
   this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-  this.update();
   return this._div;
 };
 
 // method that we will use to update the control based on feature properties passed
-info.update = function (props) {
-  if(typeof props !== "undefined"){
-    data = JSON.parse(props)['people'];
-
+info.update = function (data) {
     var str = ''; 
-    for(i = 0; i < data.length; i++){
-      var url = data[i]['name'].replace(' ', '+')
-      str += '<div class="item"><a target="_blank" rel="noopener noreferrer" href="https://duckduckgo.com/?q=' + url + '&t=ffab&ia=news&iax=about"> 👨‍🚀 ' + data[i]['name'] + '</a></div>'
+    people_arr = data['people']
+    for(i = 0; i < people_arr.length; i++){
+      var url = people_arr[i]['name'].replace(' ', '+')
+      str += '<div class="item"><a target="_blank" rel="noopener noreferrer" href="https://duckduckgo.com/?q=' + url + '&t=ffab&ia=news&iax=about"> 👨‍🚀 ' + people_arr[i]['name'] + '</a></div>'
     }
 
     this._div.innerHTML = '<h4>People in space:</h4>' + str
-  }
 };
 
 //==============================================================================
@@ -143,27 +144,21 @@ info.update = function (props) {
 var infoiss = L.control({ position : 'bottomright' });
 
 infoiss.onAdd = function (map) {
-  this._div = L.DomUtil.create('div', 'info'); // create a div with a class "infoiss"
-  this.update();
+  this._div = L.DomUtil.create('div', 'infoiss');
   return this._div;
 };
 
 // method that we will use to update the control based on feature properties passed
-infoiss.update = function (issfullinfo) {
-  if(typeof issfullinfo !== "undefined"){
-    data = JSON.parse(issfullinfo);
-
+infoiss.update = function (data) {
     var str = ''; 
     var array_keys = ['latitude', 'longitude', 'altitude', 'velocity'];
  
     str += '<div class="item"><a target="_blank" rel="noopener noreferrer" href="http://maps.google.com/maps?z=12&t=m&q=loc:' + data['latitude'] + '+' + data['longitude'] + '">' + Number(data['latitude']).toFixed(4) + ', ' + Number(data['longitude']).toFixed(4) + '</a></div>'
-    // str += '<div class="item"> Latitude: ' + data['latitude'] + '</div>'
-    // str += '<div class="item"> Longitude: ' + data['longitude'] + '</div>'
+    
     str += '<div class="item"> Altitude: ' + Number(data['altitude']).toFixed(2) + ' km</div>'
     str += '<div class="item"> Velocity: ' + Number(data['velocity']).toFixed(2) + ' km/h</div>'
 
     this._div.innerHTML = '<h4>Information:</h4>' + str
-  }
 };
 
 
@@ -216,32 +211,22 @@ function addNonMobileElements(){
     terminator.addTo(map)
     var terminatorRefreshTimer = setInterval(function(){updateTerminator(terminator)}, 1000);
 
+    document.getElementsByClassName('infoiss')[0].setAttribute('display', 'block')
+
     // Update information window about people in space
     httpGet(window.location.href + 'people', function(response){
-      info.update(response);  
+      data = JSON.parse(response);
+      info.update(data);  
     });
     
     var infoRefreshTimer = setInterval(
       function(){
         httpGet(window.location.href + 'people', function(response){
-          info.update(response);  
+          data = JSON.parse(response);
+          info.update(data);  
         })
       },
       86400000 // Every 24 hour
-    );
-
-    // Update information window about people in space
-    httpGet(window.location.href + 'issfullinfo', function(response){
-      infoiss.update(response);  
-    });
-    
-    var infoissRefreshTimer = setInterval(
-      function(){
-        httpGet(window.location.href + 'issfullinfo', function(response){
-          infoiss.update(response);  
-        })
-      },
-      3000 // Every 24 hour
     );
 
   } else if( width < 480) { // is mobile 
@@ -249,7 +234,7 @@ function addNonMobileElements(){
     // Remove all elements as they eat screen or laggy (terminator)
     infoExist = false
     info.remove();
-    infoiss.remove();
+    document.getElementsByClassName('infoiss')[0].setAttribute('display', 'none')
     terminator.remove()
     clearInterval(infoRefreshTimer);
     clearInterval(infoissRefreshTimer);

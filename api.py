@@ -39,15 +39,6 @@ class Source:
         self.__update()
         return self.fullinfo
 
-    def get_iss_coords(self):
-        '''
-        Returns satellite coordinates.
-        Returns:
-            List in format [latitude, longitude]
-        '''
-        self.__update()
-        return [self.fullinfo['latitude'], self.fullinfo['longitude']]
-
     def get_people(self):
         '''
         Returns information about number of people in space.
