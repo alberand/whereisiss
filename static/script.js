@@ -1,48 +1,89 @@
+var gMapsUrl = 'http://maps.google.com/maps?z=12&t=m&q=loc:{lat}+{lon}'
+
+var astroLink = `
+<div class="item">
+	<a target="_blank" rel="noopener noreferrer" 
+		href="https://duckduckgo.com/?q={url}&t=ffab&ia=news&iax=about"> 👨‍🚀 {name}
+	</a>
+</div>`
+
+var mapboxUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/256/
+	{z}/{x}/{y}?access_token=pk.eyJ1Ijoic25hc2hlIiwiYSI6ImRFWFVLLWcifQ.IcYEbFzFZGuPmMDAGfx4ew`
+
+var latLonLink = `
+<div class="item">
+  <a target="_blank" rel="noopener noreferrer" 
+    href="http://maps.google.com/maps?z=12&t=m&q=loc:{lat}+{lon}">
+    {latText}, {lonText}
+  </a>
+</div>`
+
+/* string.formatUnicorn({key: value}) */
+String.prototype.formatUnicorn = String.prototype.formatUnicorn ||
+function () {
+    "use strict";
+    var str = this.toString();
+    if (arguments.length) {
+        var t = typeof arguments[0];
+        var key;
+        var args = ("string" === t || "number" === t) ?
+            Array.prototype.slice.call(arguments)
+            : arguments[0];
+
+        for (key in args) {
+            str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
+        }
+    }
+
+    return str;
+};
+
 /* Called when click on marker (ISS) */
 function onClick(e) {
     window.open(this.options.url);
 }
 
 /* Add ISS Marker */
-function createISS(lat, lon){
+function createISS(newLat, newLon){
 	iss_icon = L.icon({
     iconUrl: 'static/iss.png',
     iconRetinaUrl: 'iss@2x.png',
     iconSize: [128, 128],
 	});
 
-  lon = lon - 360;
+  newLon = newLon - 360;
   // Add 3 ISS to allow on left and right sides
   // There is LeafLet parameter for copying map but it's quite laggy
   for(var i = 0; i < 3; i++){
-    console.log(lon + ' ' + lat);
-    var station = new L.Marker([lat, lon], {
+    console.log('Add ISS  at [' + newLon + ' ' + newLat + ']');
+    var station = new L.Marker([newLat, newLon], {
       icon: new L.DivIcon({
           className: 'iss-icon',
           html: '<span id="iss">🛰️</span>'
       }),
-			url: 'http://maps.google.com/maps?z=12&t=m&q=loc:' + lat + '+' + lon
+			url: gMapsUrl.formatUnicorn({lat: newLat, lon: newLon})
+			//'http://maps.google.com/maps?z=12&t=m&q=loc:' + newLat + '+' + newLon
     });
 
     mul_iss[i] = station;
     station.addTo(map);
-    lon = lon + 360;
+    newLon = newLon + 360;
     mul_iss[i].on('click', onClick);
   }
 }
 
-function moveISS(lat, lon){
-  console.log("Got new coords [" + lat + ", " + lon + "]"); 
+function moveISS(newLat, newLon){
+  console.log("Got new coords [" + newLat + ", " + newLon + "]"); 
 
   if(follow){
-    map.panTo(new L.LatLng(lat, lon));
+    map.panTo(new L.LatLng(newLat, newLon));
   }
 
-  lon = lon - 360;
+  newLon = newLon - 360;
   for(var i = 0; i < mul_iss.length; i++){
-	  mul_iss[i].setLatLng([lat, lon])
-		mul_iss[i].options.url = 'http://maps.google.com/maps?z=12&t=m&q=loc:' + lat + '+' + lon
-    lon = lon + 360;
+	  mul_iss[i].setLatLng([newLat, newLon])
+		mul_iss[i].options.url = gMapsUrl.formatUnicorn({lat: newLat, lon: newLon})
+    newLon = newLon + 360;
   }
 }
 
@@ -64,26 +105,50 @@ function httpGet(url, callback)
     xmlHttp.send(null);
 }
 
+/*==============================================================================
+ * Initialize map
+ *=============================================================================/
+
+/* Set to 'true' camera will follow ISS */
+follow = false
+
+/*
+ * Initialize map.
+ */
+var map = L.map('mapid').setView([0, 0], 3);
+map.setMaxBounds( [[-90,-360], [90,360]] )
+
+L.tileLayer(
+	mapboxUrl, 
+	{
+    maxZoom: 18,
+    minZoom: 3,
+    maxBoundsViscosity: 0.5
+    //noWrap: true
+  }
+).addTo(map);
+
+var mul_iss = [];
 
 //==============================================================================
 // Add windows with people in space
 //==============================================================================
 // Adding info window
 var info = L.control();
-info.addTo(map);
 
 info.onAdd = function (map) {
   this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
   return this._div;
 };
+// info.addTo(map);
 
 // method that we will use to update the control based on feature properties passed
 info.update = function (data) {
     var str = ''; 
     people_arr = data['people']
     for(i = 0; i < people_arr.length; i++){
-      var url = people_arr[i]['name'].replace(' ', '+')
-      str += '<div class="item"><a target="_blank" rel="noopener noreferrer" href="https://duckduckgo.com/?q=' + url + '&t=ffab&ia=news&iax=about"> 👨‍🚀 ' + people_arr[i]['name'] + '</a></div>'
+      var nameInUrl = people_arr[i]['name'].replace(' ', '+')
+      str += astroLink.formatUnicorn({url: nameInUrl, name: people_arr[i]['name']});
     }
 
     this._div.innerHTML = '<h4>People in space:</h4>' + str
@@ -94,19 +159,23 @@ info.update = function (data) {
 //==============================================================================
 // Adding info window
 var infoiss = L.control({ position : 'bottomright' });
-infoiss.addTo(map);
 
 infoiss.onAdd = function (map) {
   this._div = L.DomUtil.create('div', 'infoiss');
   return this._div;
 };
+// infoiss.addTo(map);
 
 // method that we will use to update the control based on feature properties passed
 infoiss.update = function (data) {
     var str = ''; 
     var array_keys = ['latitude', 'longitude', 'altitude', 'velocity'];
  
-    str += '<div class="item"><a target="_blank" rel="noopener noreferrer" href="http://maps.google.com/maps?z=12&t=m&q=loc:' + data['latitude'] + '+' + data['longitude'] + '">' + Number(data['latitude']).toFixed(4) + ', ' + Number(data['longitude']).toFixed(4) + '</a></div>'
+    str += latLonLink.formatUnicorn({
+      lat: data['latitude'], lon: data['longitude'], 
+      latText: Number(data['latitude']).toFixed(4), 
+      lonText: Number(data['longitude']).toFixed(4)
+    })
     
     str += '<div class="item"> Altitude: ' + Number(data['altitude']).toFixed(2) + ' km</div>'
     str += '<div class="item"> Velocity: ' + Number(data['velocity']).toFixed(2) + ' km/h</div>'
@@ -137,6 +206,8 @@ function updateTerminator(t) {
     t.setLatLngs(t2.getLatLngs());
     t.redraw();
 }
+terminator.refreshTimer = setInterval(function(){
+  updateTerminator(terminator)}, 1000);
 
 //==============================================================================
 // Add info elements if not mobile
@@ -157,13 +228,15 @@ function switchToMobile(){
     console.log('Switched to mobile')
 
     // Remove all elements as they eat screen or laggy (terminator)
-    document.getElementsByClassName('info')[0].setAttribute('display', 'none')
-    document.getElementsByClassName('infoiss')[0].setAttribute('display', 'none')
+    // document.getElementsByClassName('info')[0].setAttribute('display', 'none')
+    // document.getElementsByClassName('infoiss')[0].setAttribute('display', 'none')
     terminator.remove()
 
+    info.remove()
+    infoiss.remove()
     // Disable updates
-    clearInterval(infoRefreshTimer);
-    clearInterval(terminatorRefreshTimer);
+    // clearInterval(infoRefreshTimer);
+    clearInterval(terminator.refreshTimer);
 
     // Move control elements to the right side
     map.zoomControl.setPosition('topright');
@@ -192,10 +265,11 @@ function switchToDesktop(){
     // Add day/night overlay
     // It's too heavy for mobile
     terminator.addTo(map)
-    var terminatorRefreshTimer = setInterval(function(){updateTerminator(terminator)}, 1000);
+    terminator.refreshTimer = setInterval(function(){
+      updateTerminator(terminator)}, 1000);
 
-    document.getElementsByClassName('info')[0].setAttribute('display', 'block')
-    document.getElementsByClassName('infoiss')[0].setAttribute('display', 'block')
+    info.addTo(map)
+    infoiss.addTo(map)
 
     // Update information window about people in space
     httpGet(window.location.href + 'people', function(response){
@@ -213,31 +287,6 @@ function switchToDesktop(){
       86400000 // Every 24 hour
     );
 }
-
-/*==============================================================================
- * Main section.
- *=============================================================================/
-
-/* Set to 'true' camera will follow ISS */
-follow = false
-
-/*
- * Initialize map.
- */
-var map = L.map('mapid').setView([0, 0], 3);
-map.setMaxBounds( [[-90,-360], [90,360]] )
-
-L.tileLayer(
-	mapboxUrl, 
-	{
-    maxZoom: 18,
-    minZoom: 3,
-    maxBoundsViscosity: 0.5
-    //noWrap: true
-  }
-).addTo(map);
-
-var mul_iss = [];
 
 // Create ISS on the map
 httpGet(window.location.href + 'coords', createISS);
@@ -257,7 +306,9 @@ setInterval(function(){
     lat = data['latitude'];
     lon = data['longitude'];
     moveISS(lat, lon);  
-    infoiss.update(data);  
+    if(infoiss._div){
+      infoiss.update(data);  
+    }
   })},
   3000 // [ms]
 );
@@ -266,4 +317,3 @@ setInterval(function(){
 adjustForScreensize()
 window.addEventListener('resize', adjustForScreensize)
 window.addEventListener('load', adjustForScreensize)
-
