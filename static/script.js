@@ -111,6 +111,8 @@ function httpGet(url, callback)
 
 /* Set to 'true' camera will follow ISS */
 follow = false
+/* Already big */
+var bigScreen = true
 
 var root = location.protocol + '//' + location.host + '/';
 
@@ -217,10 +219,12 @@ terminator.refreshTimer = setInterval(function(){
 function adjustForScreensize(){
   var width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
-  if(width > 480) {
+  if(width > 480 && !bigScreen) {
     switchToDesktop();
+    bigScreen = true;
   } else if(width < 480) {
     switchToMobile();
+    bigScreen = false;
   } else {
     console.log('Don\'t switch')
   }
