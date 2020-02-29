@@ -64,61 +64,13 @@ function httpGet(url, callback)
     xmlHttp.send(null);
 }
 
-/*==============================================================================
- * Main section.
- *=============================================================================/
-
-/* Set to 'true' camera will follow ISS */
-follow = false
-/* Information elements exists */
-infoExist = false
-
-/*
- * Initialize map.
- */
-var map = L.map('mapid').setView([0, 0], 3);
-map.setMaxBounds( [[-90,-360], [90,360]] )
-
-L.tileLayer(
-	'https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic25hc2hlIiwiYSI6ImRFWFVLLWcifQ.IcYEbFzFZGuPmMDAGfx4ew', 
-	{
-    maxZoom: 18,
-    minZoom: 3,
-    maxBoundsViscosity: 0.5
-    //noWrap: true
-  }
-).addTo(map);
-
-var mul_iss = [];
-
-// Create ISS on the map
-httpGet(window.location.href + 'coords', createISS);
-httpGet(window.location.href + 'issfullinfo', function(response){
-  data = JSON.parse(response);
-
-  lat = data['latitude'];
-  lon = data['longitude'];
-  createISS(lat, lon);  
-});
-
-// Update ISS position every 3 seconds.
-setInterval(function(){
-  httpGet(window.location.href + 'issfullinfo', function(response){
-    data = JSON.parse(response);
-
-    lat = data['latitude'];
-    lon = data['longitude'];
-    moveISS(lat, lon);  
-    infoiss.update(data);  
-  })},
-  3000 // [ms]
-);
 
 //==============================================================================
 // Add windows with people in space
 //==============================================================================
 // Adding info window
 var info = L.control();
+info.addTo(map);
 
 info.onAdd = function (map) {
   this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
@@ -142,6 +94,7 @@ info.update = function (data) {
 //==============================================================================
 // Adding info window
 var infoiss = L.control({ position : 'bottomright' });
+infoiss.addTo(map);
 
 infoiss.onAdd = function (map) {
   this._div = L.DomUtil.create('div', 'infoiss');
@@ -188,11 +141,44 @@ function updateTerminator(t) {
 //==============================================================================
 // Add info elements if not mobile
 //==============================================================================
-function addNonMobileElements(){
+function adjustForScreensize(){
   var width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-  if( width > 480 && !infoExist) { // is desktop
+
+  if(width > 480) {
+    switchToDesktop();
+  } else if(width < 480) {
+    switchToMobile();
+  } else {
+    console.log('Don\'t switch')
+  }
+}
+
+function switchToMobile(){
+    console.log('Switched to mobile')
+
+    // Remove all elements as they eat screen or laggy (terminator)
+    document.getElementsByClassName('info')[0].setAttribute('display', 'none')
+    document.getElementsByClassName('infoiss')[0].setAttribute('display', 'none')
+    terminator.remove()
+
+    // Disable updates
+    clearInterval(infoRefreshTimer);
+    clearInterval(terminatorRefreshTimer);
+
+    // Move control elements to the right side
+    map.zoomControl.setPosition('topright');
+    followButton.setPosition('topright');
+
+    // Change of position should preceed addition of new classes as
+    // setPosition() resets classList
+    // Make control element bigger
+    document.getElementsByClassName('leaflet-control-zoom-in')[0].classList.add("big-control")
+    document.getElementsByClassName('leaflet-control-zoom-out')[0].classList.add("big-control")
+    document.querySelector('.easy-button-button').classList.add("big-control")
+}
+
+function switchToDesktop(){
     console.log('Switched to desktop')
-    infoExist = true
 
     // Make element small
     document.getElementsByClassName('leaflet-control-zoom-in')[0].classList.remove("big-control")
@@ -203,14 +189,12 @@ function addNonMobileElements(){
     map.zoomControl.setPosition('topleft');
     followButton.setPosition('topleft');
 
-    info.addTo(map);
-    infoiss.addTo(map);
-
     // Add day/night overlay
     // It's too heavy for mobile
     terminator.addTo(map)
     var terminatorRefreshTimer = setInterval(function(){updateTerminator(terminator)}, 1000);
 
+    document.getElementsByClassName('info')[0].setAttribute('display', 'block')
     document.getElementsByClassName('infoiss')[0].setAttribute('display', 'block')
 
     // Update information window about people in space
@@ -228,32 +212,58 @@ function addNonMobileElements(){
       },
       86400000 // Every 24 hour
     );
-
-  } else if( width < 480) { // is mobile 
-    console.log('Switched to mobile')
-    // Remove all elements as they eat screen or laggy (terminator)
-    infoExist = false
-    info.remove();
-    document.getElementsByClassName('infoiss')[0].setAttribute('display', 'none')
-    terminator.remove()
-    clearInterval(infoRefreshTimer);
-    clearInterval(infoissRefreshTimer);
-    clearInterval(terminatorRefreshTimer);
-    // Move control elements to the right side
-    map.zoomControl.setPosition('topright');
-    followButton.setPosition('topright');
-    // Change of position should preceed addition of new classes as
-    // setPosition() resets classList
-    // Make control element bigger
-    document.getElementsByClassName('leaflet-control-zoom-in')[0].classList.add("big-control")
-    document.getElementsByClassName('leaflet-control-zoom-out')[0].classList.add("big-control")
-    document.querySelector('.easy-button-button').classList.add("big-control")
-  } else {
-    console.log('Don\'t switch')
-  }
 }
 
+/*==============================================================================
+ * Main section.
+ *=============================================================================/
+
+/* Set to 'true' camera will follow ISS */
+follow = false
+
+/*
+ * Initialize map.
+ */
+var map = L.map('mapid').setView([0, 0], 3);
+map.setMaxBounds( [[-90,-360], [90,360]] )
+
+L.tileLayer(
+	mapboxUrl, 
+	{
+    maxZoom: 18,
+    minZoom: 3,
+    maxBoundsViscosity: 0.5
+    //noWrap: true
+  }
+).addTo(map);
+
+var mul_iss = [];
+
+// Create ISS on the map
+httpGet(window.location.href + 'coords', createISS);
+httpGet(window.location.href + 'issfullinfo', function(response){
+  data = JSON.parse(response);
+
+  lat = data['latitude'];
+  lon = data['longitude'];
+  createISS(lat, lon);  
+});
+
+// Update ISS position every 3 seconds.
+setInterval(function(){
+  httpGet(window.location.href + 'issfullinfo', function(response){
+    data = JSON.parse(response);
+
+    lat = data['latitude'];
+    lon = data['longitude'];
+    moveISS(lat, lon);  
+    infoiss.update(data);  
+  })},
+  3000 // [ms]
+);
+
 // Call it once to open pop-ups if we are on desktop
-addNonMobileElements()
-window.addEventListener('resize', addNonMobileElements)
-window.addEventListener('load', addNonMobileElements)
+adjustForScreensize()
+window.addEventListener('resize', adjustForScreensize)
+window.addEventListener('load', adjustForScreensize)
+
