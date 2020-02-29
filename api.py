@@ -23,10 +23,8 @@ class Source:
     '''
 
     def __init__(self):
-        self.people_last_update = time.time()
         self.people = dict()
         self.people.update(self.make_request(ASTROS_URL))
-        self.fullinfo_last_update = time.time()
         self.fullinfo = dict()
         self.fullinfo.update(self.make_request(ISS_URL))
 
@@ -36,7 +34,6 @@ class Source:
         Returns:
             Dictionary.
         '''
-        self.__update()
         return self.fullinfo
 
     def get_people(self):
@@ -45,20 +42,13 @@ class Source:
         Returns:
             Dictionary object.
         '''
-        self.__update()
         return self.people
 
-    def __update(self):
-        '''
-        Update internal data structure.
-        '''
-        if (time.time() - self.fullinfo_last_update) >= 3:
-            self.fullinfo_last_update = time.time()
-            self.fullinfo.update(self.make_request(ISS_URL))
+    def update_coordinates(self):
+        self.fullinfo.update(self.make_request(ISS_URL))
 
-        if (time.time() - self.people_last_update) >= 86400:
-            self.people_last_update = time.time()
-            self.people.update(self.make_request(ASTROS_URL))
+    def update_people(self):
+        self.people.update(self.make_request(ASTROS_URL))
 
     def make_request(self, url):
         with urlrequest.urlopen(url) as response:
