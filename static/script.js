@@ -112,6 +112,8 @@ function httpGet(url, callback)
 /* Set to 'true' camera will follow ISS */
 follow = false
 
+var root = location.protocol + '//' + location.host + '/';
+
 /*
  * Initialize map.
  */
@@ -272,14 +274,14 @@ function switchToDesktop(){
     infoiss.addTo(map)
 
     // Update information window about people in space
-    httpGet(window.location.href + 'people', function(response){
+    httpGet(root + 'people', function(response){
       data = JSON.parse(response);
       info.update(data);  
     });
     
     var infoRefreshTimer = setInterval(
       function(){
-        httpGet(window.location.href + 'people', function(response){
+        httpGet(root + 'people', function(response){
           data = JSON.parse(response);
           info.update(data);  
         })
@@ -289,7 +291,7 @@ function switchToDesktop(){
 }
 
 // Create ISS on the map
-httpGet(window.location.href + 'issfullinfo', function(response){
+httpGet(root + 'issfullinfo', function(response){
   data = JSON.parse(response);
 
   lat = data['latitude'];
@@ -299,7 +301,7 @@ httpGet(window.location.href + 'issfullinfo', function(response){
 
 // Update ISS position every 3 seconds.
 setInterval(function(){
-  httpGet(window.location.href + 'issfullinfo', function(response){
+  httpGet(root + 'issfullinfo', function(response){
     data = JSON.parse(response);
 
     lat = data['latitude'];
