@@ -289,7 +289,6 @@ function switchToDesktop(){
 }
 
 // Create ISS on the map
-httpGet(window.location.href + 'coords', createISS);
 httpGet(window.location.href + 'issfullinfo', function(response){
   data = JSON.parse(response);
 
