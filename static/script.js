@@ -314,7 +314,7 @@ setInterval(function(){
       infoiss.update(data);  
     }
   })},
-  3000 // [ms]
+  3100 // [ms]
 );
 
 // Call it once to open pop-ups if we are on desktop
