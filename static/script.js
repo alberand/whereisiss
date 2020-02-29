@@ -297,6 +297,9 @@ httpGet(root + 'issfullinfo', function(response){
   lat = data['latitude'];
   lon = data['longitude'];
   createISS(lat, lon);  
+  if(infoiss._div){
+    infoiss.update(data);  
+  }
 });
 
 // Update ISS position every 3 seconds.
