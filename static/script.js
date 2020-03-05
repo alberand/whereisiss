@@ -112,7 +112,7 @@ function httpGet(url, callback)
 /* Set to 'true' camera will follow ISS */
 follow = false
 /* Already big */
-var bigScreen = true
+var bigScreen = false
 
 var root = location.protocol + '//' + location.host + '/';
 
