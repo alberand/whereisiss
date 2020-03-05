@@ -7,6 +7,11 @@ app = Flask(__name__)
 
 src = Source()
 
+class RepeatTimer(Timer):
+    def run(self):
+        while not self.finished.wait(self.interval):
+            self.function(*self.args, **self.kwargs)
+
 t1 = RepeatTimer(3.0, src.update_coordinates)
 t1.start()
 t2 = RepeatTimer(86400.0, src.update_people)
@@ -26,12 +31,6 @@ def get_iss_full_info():
 def get_people_in_space():
     data = src.get_people()
     return json.dumps(data)
-
-
-class RepeatTimer(Timer):
-    def run(self):
-        while not self.finished.wait(self.interval):
-            self.function(*self.args, **self.kwargs)
 
 if __name__ == "__main__":
     app.run(host=os.environ['ISSMAP_DEMO_HOST'])
