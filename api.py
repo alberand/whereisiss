@@ -45,9 +45,11 @@ class Source:
         return self.people
 
     def update_coordinates(self):
+        print("update_coordinates")
         self.fullinfo.update(self.make_request(ISS_URL))
 
     def update_people(self):
+        print("update_people")
         self.people.update(self.make_request(ASTROS_URL))
 
     def make_request(self, url):
