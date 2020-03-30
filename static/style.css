@@ -14,6 +14,17 @@ html, body, #map {
   height: 100vh;
 }
 
+#next-page{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: white;
+    text-align: center;
+    z-index: 500;
+    height: 40px;
+}
+
 /* Styles for info window on the map. */
 .info {
   padding: 8px 10px;
