@@ -89,3 +89,7 @@ div.leaflet-marker-icon:nth-child(2) {
   height: 45px !important;
   line-height: 45px !important;
 }
+#thanks {
+  text-align: center;
+  color: #666;
+}
