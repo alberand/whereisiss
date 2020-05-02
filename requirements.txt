@@ -1,7 +1,16 @@
+blinker==1.4
 Click==7.0
+docutils==0.16
+feedgenerator==1.9.1
 Flask==1.1.1
+Flask-APScheduler==1.11.0
 itsdangerous==1.1.0
 Jinja2==2.10.3
 MarkupSafe==1.1.1
+python-dateutil==2.8.1
+pytz==2019.3
+six==1.14.0
+tzlocal==2.0.0
+Unidecode==1.1.1
 uWSGI==2.0.18
 Werkzeug==0.16.0

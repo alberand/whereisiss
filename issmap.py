@@ -1,21 +1,14 @@
-import os
-from flask import Flask, render_template
-from api import Source
 import json
-from threading import Timer
+import os
+
+from flask_apscheduler import APScheduler
+from flask import Flask, render_template
+
+from api import Source
+
 app = Flask(__name__)
 
 src = Source()
-
-class RepeatTimer(Timer):
-    def run(self):
-        while not self.finished.wait(self.interval):
-            self.function(*self.args, **self.kwargs)
-
-t1 = RepeatTimer(3.0, src.update_coordinates)
-t1.start()
-t2 = RepeatTimer(86400.0, src.update_people)
-t2.start()
 
 @app.route("/")
 def main():
@@ -30,4 +23,10 @@ def get_people_in_space():
     return json.dumps(src.get_people())
 
 if __name__ == "__main__":
+    scheduler = APScheduler()
+    scheduler.add_job(func=src.update_coordinates, args=[], trigger='interval',
+                id='coordinates', seconds=3)
+    scheduler.add_job(func=src.update_people, args=[], trigger='interval',
+                id='people', hours=3)
+    scheduler.start()
     app.run(host=os.environ['ISSMAP_DEMO_HOST'])
