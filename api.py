@@ -29,28 +29,18 @@ class Source:
         self.fullinfo.update(self.make_request(ISS_URL))
 
     def get_iss_info(self):
-        '''
-        Returns complete available information.
-        Returns:
-            Dictionary.
-        '''
         return self.fullinfo
 
     def get_people(self):
-        '''
-        Returns information about number of people in space.
-        Returns:
-            Dictionary object.
-        '''
         return self.people
 
     def update_coordinates(self):
-        print("update_coordinates")
         self.fullinfo.update(self.make_request(ISS_URL))
+        print(self.fullinfo)
 
     def update_people(self):
-        print("update_people")
         self.people.update(self.make_request(ASTROS_URL))
+        print(self.people)
 
     def make_request(self, url):
         with urlrequest.urlopen(url) as response:

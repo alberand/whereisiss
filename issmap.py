@@ -19,18 +19,15 @@ t2.start()
 
 @app.route("/")
 def main():
-    template = 'index.html'
-    return render_template(template, data=src.get_iss_info())
+    return render_template('index.html', data=src.get_iss_info())
 
 @app.route("/issfullinfo")
 def get_iss_full_info():
-    data = src.get_iss_info()
-    return json.dumps(data)
+    return json.dumps(src.get_iss_info())
 
 @app.route("/people")
 def get_people_in_space():
-    data = src.get_people()
-    return json.dumps(data)
+    return json.dumps(src.get_people())
 
 if __name__ == "__main__":
     app.run(host=os.environ['ISSMAP_DEMO_HOST'])
