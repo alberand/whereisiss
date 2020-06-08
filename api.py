@@ -1,5 +1,6 @@
 import json
 import time
+import sys
 # Fix for Python 2
 try:
         import urllib.request as urlrequest
@@ -50,4 +51,5 @@ class Source:
             else:
                 app.logger.warning('Can\'t receive information from API.\n'
                         'URL is {}'.format(url))
+                sys.exit(1)
                 return None
