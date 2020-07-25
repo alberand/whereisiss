@@ -1,6 +1,6 @@
 ### International Space Station map
 
-![Where is ISS at?](./sreenshot.png)
+[![Where is ISS at?](./screenshot.png)](http://whereisiss.com/)
 
 It is small weekend project which extended to much further than one weekend. I
 wanted to know what is position of ISS related to the Earth. So, I made this
