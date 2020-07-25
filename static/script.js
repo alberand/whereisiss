@@ -76,7 +76,7 @@ function moveISS(newLat, newLon){
   console.log("Got new coords [" + newLat + ", " + newLon + "]"); 
 
   if(follow){
-    map.panTo(new L.LatLng(newLat, newLon));
+    map.flyTo(new L.LatLng(newLat, newLon));
   }
 
   newLon = newLon - 360;
