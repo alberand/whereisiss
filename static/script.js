@@ -119,7 +119,11 @@ var root = location.protocol + '//' + location.host + '/';
 /*
  * Initialize map.
  */
-var map = L.map('mapid').setView([0, 0], 3);
+var map = L.map('mapid',{
+  scrollWheelZoom: false, // disable original zoom function
+  smoothWheelZoom: true,  // enable smooth zoom 
+  smoothSensitivity: 1,   // zoom speed. default is 1
+}).setView([0, 0], 3);
 map.setMaxBounds( [[-90,-360], [90,360]] )
 
 L.tileLayer(
