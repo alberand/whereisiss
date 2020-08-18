@@ -123,6 +123,7 @@ var map = L.map('mapid',{
   scrollWheelZoom: false, // disable original zoom function
   smoothWheelZoom: true,  // enable smooth zoom 
   smoothSensitivity: 1,   // zoom speed. default is 1
+  renderer: L.svg({ padding: 100 })
 }).setView([0, 0], 3);
 map.setMaxBounds( [[-90,-360], [90,360]] )
 
@@ -209,13 +210,8 @@ var followButton = L.easyButton('<img src="static/crosshair.svg" id="follow-mode
 // Create terminator
 //==============================================================================
 var terminator = L.terminator()
-function updateTerminator(t) {
-    var t2 = L.terminator();
-    t.setLatLngs(t2.getLatLngs());
-    t.redraw();
-}
 terminator.refreshTimer = setInterval(function(){
-  updateTerminator(terminator)}, 1000);
+  terminator.setTime()}, 1000);
 
 //==============================================================================
 // Add info elements if not mobile
