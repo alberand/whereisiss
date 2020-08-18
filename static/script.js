@@ -272,7 +272,7 @@ function switchToDesktop(){
     // It's too heavy for mobile
     terminator.addTo(map)
     terminator.refreshTimer = setInterval(function(){
-      updateTerminator(terminator)}, 1000);
+      terminator.setTime()}, 1000);
 
     info.addTo(map)
     infoiss.addTo(map)
