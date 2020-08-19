@@ -76,15 +76,20 @@ function moveISS(newLat, newLon){
   console.log("Got new coords [" + newLat + ", " + newLon + "]"); 
 
   if(follow){
-    map.flyTo(new L.LatLng(newLat, newLon));
+    map.panTo(new L.LatLng(newLat, newLon));
   }
+	mul_iss[1].options.url = gMapsUrl.formatUnicorn({lat: newLat, lon: newLon})
+  var fx = new L.PosAnimation();
+  var pos = map.latLngToLayerPoint([newLat, newLon])
+  fx.run(mul_iss[1]._icon, pos, 3.1, 1);
 
   newLon = newLon - 360;
   for(var i = 0; i < mul_iss.length; i++){
 	  mul_iss[i].setLatLng([newLat, newLon])
-		mul_iss[i].options.url = gMapsUrl.formatUnicorn({lat: newLat, lon: newLon})
+
     newLon = newLon + 360;
   }
+
 }
 
 /*
@@ -127,7 +132,7 @@ var map = L.map('mapid',{
 }).setView([0, 0], 3);
 map.setMaxBounds( [[-90,-360], [90,360]] )
 
-L.tileLayer(
+var positron = L.tileLayer(
 	mapboxUrl, 
 	{
     maxZoom: 18,
@@ -136,6 +141,17 @@ L.tileLayer(
     //noWrap: true
   }
 ).addTo(map);
+
+var getPxBounds = positron._getTiledPixelBounds;
+positron._getTiledPixelBounds = function (center, zoom, tileZoom) {
+    var bounds = getPxBounds.call(this, center, zoom, tileZoom);
+    var value = 1000;
+    bounds.min.x=bounds.min.x-value;
+    bounds.min.y=bounds.min.y-value;
+    bounds.max.x=bounds.max.x+value;
+    bounds.max.y=bounds.max.y+value;
+    return bounds;
+};
 
 var mul_iss = [];
 
